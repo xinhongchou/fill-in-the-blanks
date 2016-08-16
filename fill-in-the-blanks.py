@@ -21,11 +21,21 @@ quiz_and_answer_list = {
 # no more than 5 chances, otherwise game over.
 number_of_guess = 5
 
-# try to guess each blanks right, otherwise exit the game after number_of_guess tries.
-def guess_until_right(index, value, guess, quiz_local):
-    # have to tell Python it's the global variables!
+def guess_until_right(index, value, guess, quiz):
+    """Try to guess each blanks right, otherwise exit the game after number_of_guess tries.
+
+    Args:
+        index: the (index + 1)th blank.
+        value: the correct answer of the blank.
+        guess: the initial guess
+        quiz: the whole quiz sentence.
+
+    Return:
+        the new quiz with the (index + 1)th blank filled.
+    """
+    # have to tell Python it's the global variables,
+    # otherwise it will be a local variable again.
     global number_of_guess
-    global quiz
 
     while guess != value:
         number_of_guess -= 1
@@ -38,40 +48,44 @@ def guess_until_right(index, value, guess, quiz_local):
             print "That isn't the correct answer!  Let's try again; you have %s trys left!" %(number_of_guess)
         print "\n" * 3
         print "The current paragraph reads as such:\n"
-        print quiz_local
+        print quiz
         guess = raw_input("What should be substituted in for __%s__?" %(index + 1))
 
     # have a right guess, reset the number_of_guess to 5 again.
     number_of_guess = 5
-    quiz = quiz_local.replace("___%s___" %(index + 1), guess)
-    print "Correct!\n"
+    return quiz.replace("___%s___" %(index + 1), guess)
     
 
 
-# let the user select her levle
-level = raw_input("""
-Please select a game difficulty by typing it in!
-Possible choices include easy, medium, and hard.
-""")
-print "You've chosen %s!" %(level)
-print
-print "You will get %s guesses per problem" %(number_of_guess)
-print
+def play_game():
+    """ The entry point to play the game.
+    """
+    # let the user select her levle
+    level = raw_input("""
+    Please select a game difficulty by typing it in!
+    Possible choices include easy, medium, and hard.
+    """)
+    print "You've chosen %s!\n" %(level)
+    print "You will get %s guesses per problem\n" %(number_of_guess)
 
-quiz_and_answer = quiz_and_answer_list[level]
-quiz, answer = quiz_and_answer[0], quiz_and_answer[1]
+    quiz_and_answer = quiz_and_answer_list[level]
+    quiz, answer = quiz_and_answer[0], quiz_and_answer[1]
 
-# iterate through the blanks.
-for index, value in enumerate(answer):
-    if index != len(answer) - 1:
-        print "The current paragraph reads as such:"
-    print "\n"
-    print quiz
-    guess = raw_input("What should be substituted in for __%s__?" %(index + 1))
-    guess_until_right(index, value, guess, quiz)
-    if index == len(answer) - 1:
+    # iterate through the blanks.
+    for index, value in enumerate(answer):
+        if index != len(answer) - 1:
+            print "The current paragraph reads as such:\n"
         print quiz
-        print "You won!"
+        guess = raw_input("What should be substituted in for __%s__?" %(index + 1))
+        quiz = guess_until_right(index, value, guess, quiz)
+        if index == len(answer) - 1:
+            print quiz
+            print "You won!"
+        else:
+            print "Correct!\n"
+
+# let's the fun begin!
+play_game()
 
 
 
